@@ -1,0 +1,12 @@
+{
+  "name": "fake-university-theme",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:tier4ik/wp_theme_fake-university.git",
+  "author": "Max tier4ik Shevchenko <tier4ik@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "browser-sync": "^2.26.7",
+    "gulp": "^4.0.2"
+  }
+}

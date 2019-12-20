@@ -7,6 +7,7 @@ function registerStyles() {
 
 function registerScripts() {
   wp_enqueue_script('main', get_template_directory_uri() . '/js/scripts-bundled.js', array(), false, true);
+  wp_enqueue_script('main-custom', get_template_directory_uri() . '/js/main-custom.js', array(), false, true);
 }
 
 add_action('wp_enqueue_scripts', 'registerStyles');
@@ -34,3 +35,24 @@ function has_children() {
     return false;
   endif;
 }
+//
+function university_adjust_queries($query) {
+
+  $today = date('Ymd');
+
+  if(is_post_type_archive('event') AND !is_admin() AND $query -> is_main_query()) {
+    $query -> set('meta_key', 'event_date');
+    $query -> set('orderby', 'meta_value_num');
+    $query -> set('order', 'ASC');
+    $query -> set('meta_query', array(
+      array(
+        'key' => 'event_date',
+        'compare' => '>=',
+        'value' => $today,
+        'type' => 'numeric'
+      )
+    ));
+  }
+}
+
+add_action('pre_get_posts', 'university_adjust_queries');

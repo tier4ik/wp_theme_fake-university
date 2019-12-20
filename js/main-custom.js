@@ -1,0 +1,1 @@
+console.log('%c Watching is enable', 'color: lightseagreen;');

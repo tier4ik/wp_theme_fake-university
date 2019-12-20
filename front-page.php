@@ -14,8 +14,63 @@
     <div class="full-width-split__one">
       <div class="full-width-split__inner">
         <h2 class="headline headline--small-plus t-center">Upcoming Events</h2>
+
+        <?php 
+
+          $today = date('Ymd');
         
-        <div class="event-summary">
+          $pageEvents = new WP_Query(array(
+            'post_type' => 'event',
+            'posts_per_page' => 2,
+            // сортировка по кастом значению
+            // в данном случае 'event_date' from event
+            'orderby' => 'meta_value_num',
+            'meta_key' => 'event_date',
+            // DESC - в обратном порядке
+            // ASC- в порядке
+            'order' => 'ASC',
+            // верни только те евенты, даты которых впереди т.е.
+            // event_date >= today
+            'meta_query' => array(
+              array(
+                'key' => 'event_date',
+                'compare' => '>=',
+                'value' => $today,
+                'type' => 'numeric'
+              )
+            )
+          ));
+          while($pageEvents->have_posts()) {
+            $pageEvents -> the_post();
+            // Load field value.
+            $date_string = get_field('event_date');
+
+            // Create DateTime object from value (formats must match).
+            $date = DateTime::createFromFormat('d/m/Y', $date_string); 
+            ?>
+
+            <div class="event-summary">
+              <a class="event-summary__date t-center" href="<?php the_permalink(); ?>">
+                <span class="event-summary__month"><?php echo $date->format('M'); ?></span>
+                <span class="event-summary__day"><?php echo $date->format('d');; ?></span>  
+              </a>
+              <div class="event-summary__content">
+                <h5 class="event-summary__title headline headline--tiny"><span><?php echo $date->format('Y'); ?></span>: <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
+                <p><?php 
+                  if(has_excerpt()) {
+                    echo get_the_excerpt();
+                  }else{
+                    echo wp_trim_words( get_the_content(), 18);
+                  }
+                ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
+              </div>
+            </div>
+
+        <?php } ?>
+
+        <p class="t-center no-margin"><a href="<?php echo get_post_type_archive_link('event'); ?>" class="btn btn--blue">View All Events</a></p>
+        
+        <!-- <div class="event-summary">
           <a class="event-summary__date t-center" href="#">
             <span class="event-summary__month">Mar</span>
             <span class="event-summary__day">25</span>  
@@ -36,7 +91,7 @@
           </div>
         </div>
         
-        <p class="t-center no-margin"><a href="#" class="btn btn--blue">View All Events</a></p>
+        <p class="t-center no-margin"><a href="#" class="btn btn--blue">View All Events</a></p> -->
 
       </div>
     </div>
@@ -58,7 +113,13 @@
             </a>
             <div class="event-summary__content">
               <h5 class="event-summary__title headline headline--tiny"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
-              <p><?php echo wp_trim_words( get_the_content(), 18); ?> <a href="<?php the_permalink(); ?>" class="nu gray">Read more</a></p>
+              <p><?php
+                if(has_excerpt()) {
+                  echo get_the_excerpt();
+                }else{
+                  echo wp_trim_words( get_the_content(), 18);
+                }
+              ?> <a href="<?php the_permalink(); ?>" class="nu gray">Learn more</a></p>
             </div>
           </div>
 
