@@ -27,6 +27,14 @@ get_header();
   <div class="post-item">
     <p><?php the_content() ;?></p>
   </div>
+  <h2>Related programs:</h2>
+  <ul class="link-list min-list">
+    <?php 
+      $relatedProgram = get_field('related_program');
+      foreach($relatedProgram as $program) { ?>
+        <li><a href="<?php echo get_the_permalink($program) ?>"><?php echo get_the_title($program); ?></a></li>
+      <?php } ?>
+  </ul>
 <?php
   }
 

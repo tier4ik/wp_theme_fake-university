@@ -19,6 +19,10 @@ function university_features() {
   register_nav_menu('footerLearnMenu', 'Footer Learn Menu');
   //
   add_theme_support('title-tag');
+  add_theme_support('post-thumbnails');
+  //
+  add_image_size( 'professor-landscape', 360, 240, true );
+  add_image_size( 'professor-page-banner', 1500, 350, true );
 }
 
 add_action('after_setup_theme', 'university_features');
@@ -52,6 +56,11 @@ function university_adjust_queries($query) {
         'type' => 'numeric'
       )
     ));
+  }
+  
+  if(is_post_type_archive('program') AND !is_admin() AND $query -> is_main_query()) {
+    $query -> set('orderby', 'title');
+    $query -> set('order', 'ASC');
   }
 }
 

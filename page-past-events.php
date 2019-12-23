@@ -7,9 +7,9 @@ get_header();
 <div class="page-banner">
   <div class="page-banner__bg-image" style="background-image: url(<?php echo get_theme_file_uri('images/ocean.jpg');?>);"></div>
   <div class="page-banner__content container container--narrow">
-    <h1 class="page-banner__title">All events</h1>
+    <h1 class="page-banner__title">Past Events</h1>
     <div class="page-banner__intro">
-      <p>Events! Events everywhere!</p>
+      <p>These events have already passed.</p>
     </div>
   </div>  
 </div>
@@ -17,8 +17,32 @@ get_header();
 <div class="container container--narrow page-section">
 
   <?php 
-    while(have_posts()) {
-      the_post();
+     $today = date('Ymd');
+        
+     $pastEvents = new WP_Query(array(
+       'post_type' => 'event',
+       'paged' => get_query_var('paged', 1),
+       'posts_per_page' => -1,
+       // сортировка по кастом значению
+       // в данном случае 'event_date' from event
+       'orderby' => 'meta_value_num',
+       'meta_key' => 'event_date',
+       // DESC - в обратном порядке
+       // ASC- в порядке
+       'order' => 'DESC',
+       // верни только те евенты, даты которых впереди т.е.
+       // event_date >= today
+       'meta_query' => array(
+         array(
+           'key' => 'event_date',
+           'compare' => '<',
+           'value' => $today,
+           'type' => 'numeric'
+         )
+       )
+     ));
+    while($pastEvents -> have_posts()) {
+      $pastEvents -> the_post();
       // Load field value.
       $date_string = get_field('event_date');
 
@@ -45,10 +69,11 @@ get_header();
 
   <?php
     }
-    echo paginate_links();
+    wp_reset_postdata();
+    echo paginate_links(array(
+      'total' => $pastEvents -> max_num_pages
+    ));
   ?>
-
-    <p>Looking for a recap of past events? <a href="<?php echo site_url('/past-events'); ?>">Look at our archive</a></p>
 
 </div>
 
