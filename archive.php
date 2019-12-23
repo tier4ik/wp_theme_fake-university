@@ -1,27 +1,11 @@
 <?php 
 
 get_header();
-
+pageBanner(array(
+  'title' => get_the_archive_title(),
+  'subtitle' => get_the_archive_description()
+))
 ?>
-
-<div class="page-banner">
-  <div class="page-banner__bg-image" style="background-image: url(<?php echo get_theme_file_uri('images/ocean.jpg');?>);"></div>
-  <div class="page-banner__content container container--narrow">
-    <h1 class="page-banner__title">
-    <?php the_archive_title() ?>
-      <!-- <?php if(is_category()) {
-        echo "Posts from "; single_cat_title();
-      } else if(is_author()) {
-        echo "All posts from "; the_author();
-      }
-      ?> -->
-    </h1>
-    <div class="page-banner__intro">
-      <p><?php the_archive_description(); ?></p>
-    </div>
-  </div>  
-</div>
-
 <div class="container container--narrow page-section">
 
   <?php 
