@@ -3,9 +3,6 @@ const browserSync = require('browser-sync').create();
 
 function sync() {
 
-  console.log(`          Sync is loading ...  
-              =====================================`);
-
   browserSync.init({
     proxy: 'http://fake-university.local'
   });

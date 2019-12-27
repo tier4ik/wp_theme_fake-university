@@ -1,5 +1,8 @@
 <?php
+// import for file
+require get_theme_file_path('/includes/search-rout.php');
 
+// rendering function
 function pageBanner($args = NULL) {
   // php logic will live here
     if(!$args['title']) {
@@ -16,7 +19,7 @@ function pageBanner($args = NULL) {
       }
     }
   ?>
-
+  <!-- HTML template -->
   <div class="page-banner">
     <div class="page-banner__bg-image" style="background-image: url(<?php echo $args['background']; ?>);">
     </div>
@@ -31,20 +34,28 @@ function pageBanner($args = NULL) {
   <?php
 }
 
+// register css
 function registerStyles() {
   wp_enqueue_style('font-awesome', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
   wp_enqueue_style('font', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
   wp_enqueue_style('main', get_stylesheet_uri());
 }
 
+// register js
 function registerScripts() {
   wp_enqueue_script('main', get_template_directory_uri() . '/js/scripts-bundled.js', array(), false, true);
   wp_enqueue_script('main-custom', get_template_directory_uri() . '/js/main-custom.js', array(), false, true);
+
+  //  get access to wp variable inside our custom JS file
+  wp_localize_script( 'main-custom', 'universityData', array(
+    'root_url' => get_site_url()
+  ));
 }
 
 add_action('wp_enqueue_scripts', 'registerStyles');
 add_action('wp_enqueue_scripts', 'registerScripts');
 
+// register menu and some features
 function university_features() {
   //  menu registration
   register_nav_menu('footerExploreMenu', 'Footer Explore Menu');
@@ -59,7 +70,7 @@ function university_features() {
 
 add_action('after_setup_theme', 'university_features');
 
-//  Check if the page have child pages
+// check if the page have child pages helper-function
 function has_children() {
   global $post;
   
@@ -71,7 +82,8 @@ function has_children() {
     return false;
   endif;
 }
-//
+
+// set custom settings to invoke before each query (new WP_Query)
 function university_adjust_queries($query) {
 
   $today = date('Ymd');
@@ -97,3 +109,22 @@ function university_adjust_queries($query) {
 }
 
 add_action('pre_get_posts', 'university_adjust_queries');
+
+//  Apply google API key for google maps
+function universityMapKey($api) {
+  $api['key'] = 'AIzaSyAgOAAE0_K_39xbrYMIlYRvIg0Utoeq8ks';
+  return $api;
+}
+
+add_filter('acf/fields/google_map/api', 'universityMapKey', );
+
+// add new route for our project
+function university_custom_rest() {
+  register_rest_field( 'post', 'author_name', array(
+    'get_callback' => function() {
+      return get_the_author();
+    }
+  ));
+}
+
+add_action('rest_api_init', 'university_custom_rest');
