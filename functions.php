@@ -112,7 +112,7 @@ add_action('pre_get_posts', 'university_adjust_queries');
 
 //  Apply google API key for google maps
 function universityMapKey($api) {
-  $api['key'] = 'AIzaSyAgOAAE0_K_39xbrYMIlYRvIg0Utoeq8ks';
+  $api['key'] = 'google_api_key';
   return $api;
 }
 
