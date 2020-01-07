@@ -114,7 +114,7 @@ add_action('pre_get_posts', 'university_adjust_queries');
 
 //  Apply google API key for google maps
 function universityMapKey($api) {
-  $api['key'] = 'AIzaSyAgOAAE0_K_39xbrYMIlYRvIg0Utoeq8ks';
+  $api['key'] = 'google_api_key';
   return $api;
 }
 
@@ -130,6 +130,7 @@ function university_custom_rest() {
 }
 
 add_action('rest_api_init', 'university_custom_rest');
+<<<<<<< HEAD
 
 // redirect subscriber accounts from admin to homepage
 function redirectSubsToHomepage() {
@@ -192,3 +193,5 @@ function notePostsFilter($data, $postarr) {
 }
 
 add_filter('wp_insert_post_data', 'notePostsFilter', 10, 2);
+=======
+>>>>>>> f8121abcf5d3323a42edb96be87c33e018089768
