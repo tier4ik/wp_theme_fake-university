@@ -1,6 +1,7 @@
 <?php
 // import for file
 require get_theme_file_path('/includes/search-rout.php');
+require get_theme_file_path('/includes/like-rout.php');
 
 // rendering function
 function pageBanner($args = NULL) {
@@ -48,7 +49,8 @@ function registerScripts() {
 
   //  get access to wp variable inside our custom JS file
   wp_localize_script( 'main-custom', 'universityData', array(
-    'root_url' => get_site_url()
+    'root_url' => get_site_url(),
+    'nonce' => wp_create_nonce( 'wp_rest' )
   ));
 }
 
@@ -128,3 +130,65 @@ function university_custom_rest() {
 }
 
 add_action('rest_api_init', 'university_custom_rest');
+
+// redirect subscriber accounts from admin to homepage
+function redirectSubsToHomepage() {
+  $currentUser = wp_get_current_user();
+  if(count($currentUser -> roles) == 1 AND $currentUser -> roles[0] == 'subscriber') {
+    wp_redirect(site_url('/'));
+    exit;
+  }
+}
+
+add_action( 'admin_init', 'redirectSubsToHomepage');
+
+// hide admin bar if the user is a subscriber
+function hideAdminBar() {
+  $currentUser = wp_get_current_user();
+  if(count($currentUser -> roles) == 1 AND $currentUser -> roles[0] == 'subscriber') {
+    show_admin_bar( false );
+  }
+}
+
+add_action( 'wp_loaded', 'hideAdminBar');
+
+// customize login screen img url
+function ourHeaderURL() {
+  return esc_url(site_url('/'));
+} 
+
+add_filter('login_headerurl', 'ourHeaderURL');
+
+// подключаем наши стили к странице login.php
+function customLoginCSS() {
+  wp_enqueue_style('font', '//fonts.googleapis.com/css?family=Roboto+Condensed:300,300i,400,400i,700,700i|Roboto:100,300,400,400i,700,700i');
+  wp_enqueue_style('main', get_stylesheet_uri());
+}
+
+add_action('login_enqueue_scripts', 'customLoginCSS');
+
+// customize login screen main text
+function ourHeaderText() {
+  return get_bloginfo('title');
+}
+add_filter( 'login_headertext', 'ourHeaderText' );
+
+// force note posts to be private on server-side
+function notePostsFilter($data, $postarr) {
+  if($data['post_type'] === 'note') {
+    // allow current user to create only 2 note-posts
+    if(count_user_posts( get_current_user_id(), 'note') == 2 AND !$postarr['ID']) {
+      die(json_encode(array('limitError' => 'You have reached your notes limit')));
+    }
+    // remove all HTML tags before save in DB
+    $data['post_title'] = sanitize_text_field( $data['post_title'] );
+    $data['post_content'] = sanitize_textarea_field( $data['post_content'] );
+  }
+
+  if($data['post_type'] === 'note' AND $data['post_status'] !== 'trash') {
+    $data['post_status'] = 'private';
+  }
+  return $data;
+}
+
+add_filter('wp_insert_post_data', 'notePostsFilter', 10, 2);
